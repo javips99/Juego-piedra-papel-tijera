@@ -69,7 +69,7 @@ piedra-papel-tijera/
 
 ## 📸 Captura de pantalla
 
-*(Añade aquí una captura de pantalla del juego)*
+
 
 ## 👨‍💻 Autor
 
