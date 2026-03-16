@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piedra, Papel o Tijera 🎮</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- CABECERA -->
+    <header>
+        <h1>🪨 📄 ✂️</h1>
+        <h1>Piedra, Papel o Tijera</h1>
+        <p>¡Demuestra que puedes ganarle a la máquina!</p>
+    </header>
+
+    <!-- MARCADOR -->
+    <div class="marcador">
+        <div class="marcador-item victorias">
+            <div class="marcador-numero" id="num-victorias">0</div>
+            <div class="marcador-label">✅ Victorias</div>
+        </div>
+        <div class="marcador-item empates">
+            <div class="marcador-numero" id="num-empates">0</div>
+            <div class="marcador-label">🟡 Empates</div>
+        </div>
+        <div class="marcador-item derrotas">
+            <div class="marcador-numero" id="num-derrotas">0</div>
+            <div class="marcador-label">❌ Derrotas</div>
+        </div>
+    </div>
+
+    <!-- ZONA DE JUEGO -->
+    <div class="juego">
+        <p class="instruccion">¿Cuál es tu elección?</p>
+
+        <!-- Botones para elegir -->
+        <div class="opciones">
+            <button class="btn-opcion piedra" onclick="jugar('piedra')">
+                <span class="emoji">🪨</span>
+                Piedra
+            </button>
+            <button class="btn-opcion papel" onclick="jugar('papel')">
+                <span class="emoji">📄</span>
+                Papel
+            </button>
+            <button class="btn-opcion tijera" onclick="jugar('tijera')">
+                <span class="emoji">✂️</span>
+                Tijera
+            </button>
+        </div>
+
+        <!-- Zona donde aparece el resultado (oculta hasta que se juega) -->
+        <div class="resultado-zona oculto" id="resultado-zona">
+
+            <!-- Jugador VS Máquina -->
+            <div class="versus">
+                <div class="eleccion-box">
+                    <div class="emoji" id="emoji-jugador">🤔</div>
+                    <div class="nombre">Tú</div>
+                    <div class="eleccion-texto" id="texto-jugador">—</div>
+                </div>
+                <div class="vs-texto">VS</div>
+                <div class="eleccion-box">
+                    <div class="emoji" id="emoji-maquina">🤖</div>
+                    <div class="nombre">Máquina</div>
+                    <div class="eleccion-texto" id="texto-maquina">—</div>
+                </div>
+            </div>
+
+            <!-- Chip de resultado: Victoria / Derrota / Empate -->
+            <div class="chip-resultado" id="chip-resultado"></div>
+
+            <!-- Botón para jugar otra vez -->
+            <button class="btn-reset" id="btn-reset" onclick="resetear()">
+                🔄 Jugar otra vez
+            </button>
+        </div>
+
+    </div>
+
+    <!-- HISTORIAL DE PARTIDAS -->
+    <section class="historial-seccion">
+        <h2 class="historial-titulo">Últimas partidas</h2>
+        <ul class="historial-lista" id="historial-lista">
+            <li class="sin-historial">Todavía no has jugado ninguna partida 🎮</li>
+        </ul>
+    </section>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Emojis para cada elección
+        const emojis = {
+            piedra: '🪨',
+            papel:  '📄',
+            tijera: '✂️'
+        };
+
+        // Mensajes según resultado
+        const mensajes = {
+            victoria: '🎉 ¡GANASTE!',
+            derrota:  '💀 PERDISTE',
+            empate:   '🤝 EMPATE'
+        };
+
+        // Opciones disponibles
+        const opciones = ['piedra', 'papel', 'tijera'];
+
+        // Botones del juego
+        const botonesOpcion = document.querySelectorAll('.btn-opcion');
+
+        // Cargamos el marcador desde localStorage
+        let marcador = JSON.parse(localStorage.getItem('marcador_ppt') || '{"victorias":0,"derrotas":0,"empates":0}');
+        let historialPartidas = JSON.parse(localStorage.getItem('historial_ppt') || '[]');
+
+        // Mostramos el marcador guardado al cargar
+        document.getElementById('num-victorias').textContent = marcador.victorias;
+        document.getElementById('num-derrotas').textContent  = marcador.derrotas;
+        document.getElementById('num-empates').textContent   = marcador.empates;
+
+        // Mostramos el historial guardado al cargar
+        if (historialPartidas.length > 0) {
+            const lista = document.getElementById('historial-lista');
+            lista.innerHTML = '';
+            historialPartidas.forEach(p => {
+                const item = document.createElement('li');
+                item.className = 'historial-item ' + p.resultado;
+                item.innerHTML = `
+                    <span>
+                        ${emojis[p.jugador]} ${capitalizar(p.jugador)}
+                        &nbsp;vs&nbsp;
+                        ${emojis[p.maquina]} ${capitalizar(p.maquina)}
+                    </span>
+                    <span class="badge">${capitalizar(p.resultado)}</span>
+                `;
+                lista.appendChild(item);
+            });
+        }
+
+        /**
+         * Determina el resultado de la partida
+         */
+        function determinarResultado(jugador, maquina) {
+            if (jugador === maquina) return 'empate';
+            if (
+                (jugador === 'piedra'  && maquina === 'tijera') ||
+                (jugador === 'papel'   && maquina === 'piedra') ||
+                (jugador === 'tijera'  && maquina === 'papel')
+            ) return 'victoria';
+            return 'derrota';
+        }
+
+        /**
+         * Función principal: procesa la elección y muestra el resultado
+         */
+        function jugar(eleccion) {
+            // Desactivamos los botones mientras se muestra el resultado
+            botonesOpcion.forEach(btn => btn.disabled = true);
+
+            // La máquina elige aleatoriamente
+            const eleccionMaquina = opciones[Math.floor(Math.random() * opciones.length)];
+
+            // Determinamos el resultado
+            const resultado = determinarResultado(eleccion, eleccionMaquina);
+
+            // Actualizamos el marcador
+            marcador[resultado === 'victoria' ? 'victorias' : resultado === 'derrota' ? 'derrotas' : 'empates']++;
+            localStorage.setItem('marcador_ppt', JSON.stringify(marcador));
+
+            // Mostramos la zona de resultado
+            const zonaResultado = document.getElementById('resultado-zona');
+            zonaResultado.classList.remove('oculto');
+
+            // Mostramos las elecciones
+            document.getElementById('emoji-jugador').textContent  = emojis[eleccion];
+            document.getElementById('texto-jugador').textContent  = eleccion;
+            document.getElementById('emoji-maquina').textContent  = emojis[eleccionMaquina];
+            document.getElementById('texto-maquina').textContent  = eleccionMaquina;
+
+            // Mostramos el resultado con estilo
+            const chip = document.getElementById('chip-resultado');
+            chip.textContent  = mensajes[resultado];
+            chip.className    = 'chip-resultado ' + resultado;
+
+            // Actualizamos el marcador en pantalla
+            document.getElementById('num-victorias').textContent = marcador.victorias;
+            document.getElementById('num-derrotas').textContent  = marcador.derrotas;
+            document.getElementById('num-empates').textContent   = marcador.empates;
+
+            // Añadimos la partida al historial
+            agregarAlHistorial(eleccion, eleccionMaquina, resultado);
+
+            // Mostramos el botón de "Jugar otra vez"
+            document.getElementById('btn-reset').style.display = 'block';
+        }
+
+        /**
+         * Añade una partida al historial visible en pantalla
+         */
+        function agregarAlHistorial(jugador, maquina, resultado) {
+            const lista = document.getElementById('historial-lista');
+
+            // Quitamos el mensaje de "todavía no has jugado" si existe
+            const sinHistorial = lista.querySelector('.sin-historial');
+            if (sinHistorial) sinHistorial.remove();
+
+            // Guardamos en localStorage (máximo 5)
+            historialPartidas.unshift({ jugador, maquina, resultado });
+            if (historialPartidas.length > 5) historialPartidas.pop();
+            localStorage.setItem('historial_ppt', JSON.stringify(historialPartidas));
+
+            // Creamos el nuevo elemento
+            const item = document.createElement('li');
+            item.className = 'historial-item ' + resultado;
+            item.innerHTML = `
+                <span>
+                    ${emojis[jugador]} ${capitalizar(jugador)}
+                    &nbsp;vs&nbsp;
+                    ${emojis[maquina]} ${capitalizar(maquina)}
+                </span>
+                <span class="badge">${capitalizar(resultado)}</span>
+            `;
+
+            // Lo insertamos al principio y limitamos a 5 entradas
+            lista.insertBefore(item, lista.firstChild);
+            const items = lista.querySelectorAll('.historial-item');
+            if (items.length > 5) items[items.length - 1].remove();
+        }
+
+        /**
+         * Resetea la zona de resultado para jugar otra vez
+         */
+        function resetear() {
+            document.getElementById('resultado-zona').classList.add('oculto');
+            document.getElementById('btn-reset').style.display = 'none';
+            botonesOpcion.forEach(btn => btn.disabled = false);
+        }
+
+        /**
+         * Capitaliza la primera letra de una cadena
+         */
+        function capitalizar(texto) {
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
+    </script>
+
+</body>
+</html>

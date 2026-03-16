@@ -1,0 +1,324 @@
+/* ============================================
+   PIEDRA, PAPEL O TIJERA - Retro Style (Alex Kidd)
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --rojo: #e52521;
+    --azul: #049cd8;
+    --verde: #43b047;
+    --amarillo: #fbd000;
+    --tarjeta-bg: rgba(0, 0, 0, 0.7);
+    --texto: #ffffff;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: url('../img/alex_kidd_bg.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: var(--amarillo);
+    line-height: 1.5;
+}
+
+header p {
+    font-size: 0.7rem;
+    margin-top: 10px;
+    color: #ccc;
+}
+
+/* MARCADOR */
+.marcador {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.marcador-item {
+    background: var(--tarjeta-bg);
+    border: 4px solid #fff;
+    padding: 15px;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.marcador-item.victorias { border-color: var(--verde); }
+.marcador-item.derrotas  { border-color: var(--rojo);  }
+.marcador-item.empates   { border-color: var(--amarillo); }
+
+.marcador-numero {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.victorias .marcador-numero { color: var(--verde); }
+.derrotas  .marcador-numero { color: var(--rojo);  }
+.empates   .marcador-numero { color: var(--amarillo); }
+
+.marcador-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+}
+
+/* ZONA DE JUEGO */
+.juego {
+    background: var(--tarjeta-bg);
+    border: 4px solid #fff;
+    border-radius: 0;
+    padding: 25px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 6px 6px 0 #000;
+    margin-bottom: 30px;
+}
+
+.instruccion {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--amarillo);
+    margin-bottom: 25px;
+}
+
+/* BOTONES */
+.opciones {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.btn-opcion {
+    font-family: 'Press Start 2P', cursive;
+    background: #222;
+    border: 4px solid #fff;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 0.6rem;
+    box-shadow: 4px 4px 0 #000;
+    transition: all 0.1s;
+}
+
+.btn-opcion .emoji {
+    font-size: 2.2rem;
+}
+
+.btn-opcion:hover {
+    background: #444;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
+}
+
+.btn-opcion:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.btn-opcion.piedra:hover { border-color: var(--amarillo); }
+.btn-opcion.papel:hover  { border-color: var(--azul); }
+.btn-opcion.tijera:hover { border-color: var(--rojo); }
+
+/* RESULTADO */
+.resultado-zona {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.resultado-zona.oculto {
+    display: none;
+}
+
+.versus {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.eleccion-box {
+    background: #fff;
+    border: 4px solid #000;
+    padding: 15px;
+    text-align: center;
+    color: #000;
+    text-shadow: none;
+    position: relative;
+    border-radius: 5px;
+    min-width: 120px;
+}
+
+/* Bocadillo de diálogo invertido o normal para dar efecto */
+.eleccion-box::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    margin-left: -10px;
+    border-width: 15px 15px 0 0;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+}
+
+.eleccion-box .emoji {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.eleccion-box .nombre {
+    font-size: 0.6rem;
+    margin-bottom: 8px;
+    color: var(--azul);
+}
+
+.eleccion-box .eleccion-texto {
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.vs-texto {
+    font-size: 1.2rem;
+    color: var(--amarillo);
+}
+
+.chip-resultado {
+    font-size: 1rem;
+    padding: 15px 25px;
+    border: 4px solid #fff;
+    background: #000;
+    text-align: center;
+    animation: blink 0.3s alternate 4;
+}
+
+.chip-resultado.victoria { background: var(--verde); border-color: #000; }
+.chip-resultado.derrota  { background: var(--rojo); border-color: #000; }
+.chip-resultado.empate   { background: var(--amarillo); color: #000; text-shadow: none; border-color: #000; }
+
+.btn-reset {
+    font-family: 'Press Start 2P', cursive;
+    background: var(--azul);
+    border: 4px solid #fff;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 0.6rem;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+    display: none;
+    margin-top: 10px;
+}
+
+.btn-reset:hover {
+    background: #0277a8;
+}
+
+/* HISTORIAL */
+.historial-seccion {
+    background: var(--tarjeta-bg);
+    border: 4px solid #fff;
+    padding: 25px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 6px 6px 0 #000;
+}
+
+.historial-titulo {
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--amarillo);
+    margin-bottom: 20px;
+}
+
+.historial-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.historial-item {
+    background: #111;
+    border: 3px solid #555;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.55rem;
+}
+
+.historial-item.victoria { border-color: var(--verde); }
+.historial-item.derrota  { border-color: var(--rojo); }
+.historial-item.empate   { border-color: var(--amarillo); }
+
+.historial-item span:first-child {
+    line-height: 1.5;
+}
+
+.historial-item .badge {
+    padding: 5px 8px;
+    background: #000;
+}
+
+.historial-item.victoria .badge { color: var(--verde); }
+.historial-item.derrota  .badge { color: var(--rojo); }
+.historial-item.empate   .badge { color: var(--amarillo); }
+
+.sin-historial {
+    text-align: center;
+    font-size: 0.6rem;
+    color: #aaa;
+    padding: 15px;
+}
+
+/* ANIMACIONES */
+@keyframes blink {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+@media (max-width: 480px) {
+    body { padding: 15px 10px; }
+    .juego { padding: 15px; }
+    .btn-opcion { padding: 10px; min-width: 80px; }
+    .btn-opcion .emoji { font-size: 1.8rem; }
+    .eleccion-box { min-width: 90px; padding: 10px; }
+    .eleccion-box .emoji { font-size: 1.8rem; }
+    .marcador-item { min-width: 80px; padding: 10px; }
+    .marcador-numero { font-size: 1.2rem; }
+}
